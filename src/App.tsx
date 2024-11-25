@@ -1,5 +1,6 @@
 import './App.css'
 import Grid from '@mui/material/Grid2'
+import IndicatorWeather from './components/IndicatorWeather'
 
 function App() {
 
@@ -7,10 +8,10 @@ function App() {
     <Grid container spacing={5}>
 
     {/* Indicadores */}
-    <Grid size={{xs: 12, xl:3}}>Elemento: Indicador 1</Grid>
-    <Grid size={{xs: 12, xl:3}}>Elemento: Indicador 2</Grid>
-    <Grid size={{xs: 12, xl:3}}>Elemento: Indicador 3</Grid>
-    <Grid size={{xs: 12, xl:3}}>Elemento: Indicador 4</Grid>
+    <Grid size={{xs: 12, xl:3}}><IndicatorWeather /></Grid>
+    <Grid size={{xs: 12, xl:3}}><IndicatorWeather /></Grid>
+    <Grid size={{xs: 12, xl:3}}><IndicatorWeather /></Grid>
+    <Grid size={{xs: 12, xl:3}}><IndicatorWeather /></Grid>
    
     {/* Tabla */}
     <Grid size={{xs: 12, xl:8}}>Elemento: Tabla</Grid>

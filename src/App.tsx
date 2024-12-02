@@ -5,6 +5,7 @@ import TableWeather from './components/TableWeather'
 import ControlWeather from './components/ControlWeather'
 import LineChartWeather from './components/LineChartWeather'
 import { useEffect, useState } from 'react';
+import Item from './interface/Item'
 
 
 interface Indicator {
@@ -20,6 +21,8 @@ function App() {
   let [indicators, setIndicators] = useState<Indicator[]>([])
   let [owm, setOWM] = useState(localStorage.getItem("openWeatherMap"))
 
+  const [items, setItems] = useState<Item[]>([])
+
   {/* Variable de estado y función de actualización */ }
   useEffect(() => {
     let request = async () => {
@@ -27,14 +30,14 @@ function App() {
       {/* Referencia a las claves del LocalStorage: openWeatherMap y expiringTime */ }
       let savedTextXML = localStorage.getItem("openWeatherMap") || "";
       let expiringTime = localStorage.getItem("expiringTime");
-
+      const dataToItems : Item[] = []
       {/* Obtenga la estampa de tiempo actual */ }
       let nowTime = (new Date()).getTime();
 
       {/* Request */ }
       {/* Verifique si es que no existe la clave expiringTime o si la estampa de tiempo actual supera el tiempo de expiración */ }
       if (expiringTime === null || nowTime > parseInt(expiringTime)) {
-        let API_KEY = ""
+        let API_KEY = "2bdab66598aa50c78a535885cffe390d"
         let response = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=Guayaquil&mode=xml&appid=${API_KEY}`)
         {/* Tiempo de expiración */ }
         let hours = 0.01
@@ -83,8 +86,34 @@ function App() {
         let altitude = location.getAttribute("altitude") || ""
         dataToIndicators.push({ "title": "Location", "subtitle": "Altitude", "value": altitude })
 
+        let timeList = xml.getElementsByTagName("time") || ""
+        if (timeList == undefined) return;
+        
+        Array.from(timeList).slice(0, 6).forEach((timeItem: HTMLElement) => {
+          
+          const timeFrom = timeItem.getAttribute("from") || ""
+          const timeTo = timeItem.getAttribute("to") || ""
+          let precipitation = timeItem.getElementsByTagName("precipitation")[0]
+          const probability = precipitation.getAttribute("probability") || ""
+          
+          let humidity = timeItem.getElementsByTagName("humidity")[0]
+          const humidityVal = humidity.getAttribute("value") || ""
+
+          let clouds = timeItem.getElementsByTagName("clouds")[0]
+          const cloudsAll = clouds.getAttribute("all") || ""
+          const resultItem : Item = {
+            dateStart: timeFrom,
+            dateEnd: timeTo,
+            precipitation: probability,
+            humidity: humidityVal,
+            clouds: cloudsAll
+          } 
+          dataToItems.push(resultItem)
+        });
+        
         {/* Modificación de la variable de estado mediante la función de actualización */ }
         setIndicators(dataToIndicators)
+        setItems(dataToItems)
       }
 
 
@@ -124,14 +153,14 @@ function App() {
             <ControlWeather />
           </Grid>
           <Grid size={{ xs: 12, lg: 9 }}>
-            <TableWeather />
+            <TableWeather itemsIn={items}/>
           </Grid>
         </Grid>
       </Grid>
 
       {/* Gráfico */}
       <Grid size={{ xs: 12, lg: 4 }}>
-        <LineChartWeather />
+        <LineChartWeather itemsIn={items} />
       </Grid>
 
     </Grid>

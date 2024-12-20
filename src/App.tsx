@@ -6,6 +6,10 @@ import ControlWeather from './components/ControlWeather'
 import LineChartWeather from './components/LineChartWeather'
 import { useEffect, useState } from 'react';
 import Item from './interface/Item'
+import { WeatherIndicator } from './interface/WeatherIndicator'
+import { groupIndicatorsDataByDay } from './utils/utils'
+import { Box, Typography } from '@mui/material'
+import { CloudOutlined } from '@mui/icons-material'
 
 
 interface Indicator {
@@ -18,7 +22,7 @@ function App() {
 
 
   {/* Variable de estado y función de actualización */ }
-  let [indicators, setIndicators] = useState<Indicator[]>([])
+  let [indicators, setIndicators] = useState<Array<WeatherIndicator[]>>([])
   let [owm, setOWM] = useState(localStorage.getItem("openWeatherMap"))
 
   const [items, setItems] = useState<Item[]>([])
@@ -30,7 +34,7 @@ function App() {
       {/* Referencia a las claves del LocalStorage: openWeatherMap y expiringTime */ }
       let savedTextXML = localStorage.getItem("openWeatherMap") || "";
       let expiringTime = localStorage.getItem("expiringTime");
-      const dataToItems : Item[] = []
+      const dataToItems: Item[] = []
       {/* Obtenga la estampa de tiempo actual */ }
       let nowTime = (new Date()).getTime();
 
@@ -63,56 +67,39 @@ function App() {
         const parser = new DOMParser();
         const xml = parser.parseFromString(savedTextXML, "application/xml");
 
-        {/* Arreglo para agregar los resultados */ }
-
-        let dataToIndicators: Indicator[] = new Array<Indicator>();
-
-        {/* 
-          Análisis, extracción y almacenamiento del contenido del XML 
-          en el arreglo de resultados
-        */}
-
-        let name = xml.getElementsByTagName("name")[0].innerHTML || ""
-        dataToIndicators.push({ "title": "Location", "subtitle": "City", "value": name })
-
-        let location = xml.getElementsByTagName("location")[1]
-
-        let latitude = location.getAttribute("latitude") || ""
-        dataToIndicators.push({ "title": "Location", "subtitle": "Latitude", "value": latitude })
-
-        let longitude = location.getAttribute("longitude") || ""
-        dataToIndicators.push({ "title": "Location", "subtitle": "Longitude", "value": longitude })
-
-        let altitude = location.getAttribute("altitude") || ""
-        dataToIndicators.push({ "title": "Location", "subtitle": "Altitude", "value": altitude })
+        {/* Extracción y almacenamiento del contenido del XML agrupada por 4 dias futuros*/ }
+        const todayDate = new Date()
+        let dataToIndicators: Array<WeatherIndicator[]> = groupIndicatorsDataByDay(savedTextXML, todayDate)
+        console.log(dataToIndicators)
+        setIndicators(dataToIndicators)
 
         let timeList = xml.getElementsByTagName("time") || ""
         if (timeList == undefined) return;
-        
+
         Array.from(timeList).slice(0, 6).forEach((timeItem: HTMLElement) => {
-          
+
           const timeFrom = timeItem.getAttribute("from") || ""
           const timeTo = timeItem.getAttribute("to") || ""
           let precipitation = timeItem.getElementsByTagName("precipitation")[0]
           const probability = precipitation.getAttribute("probability") || ""
-          
+
           let humidity = timeItem.getElementsByTagName("humidity")[0]
           const humidityVal = humidity.getAttribute("value") || ""
 
           let clouds = timeItem.getElementsByTagName("clouds")[0]
           const cloudsAll = clouds.getAttribute("all") || ""
-          const resultItem : Item = {
+          const resultItem: Item = {
             dateStart: timeFrom,
             dateEnd: timeTo,
             precipitation: probability,
             humidity: humidityVal,
             clouds: cloudsAll
-          } 
+          }
           dataToItems.push(resultItem)
         });
-        
+
         {/* Modificación de la variable de estado mediante la función de actualización */ }
-        setIndicators(dataToIndicators)
+        // setIndicators(dataToIndicators)
         setItems(dataToItems)
       }
 
@@ -121,23 +108,29 @@ function App() {
     request();
   }, [owm])
   return (
-    <Grid container spacing={5}>
-      {/* Indicadores */}
-      {/* <Grid size=> ... </Grid> */}
-      {/*     <Grid size={{ xs: 12, lg: 3 }}><IndicatorWeather title={'Indicator 1'} subtitle={'Unidad 1'} value={"1.23"} /></Grid>
-      <Grid size={{ xs: 12, lg: 3 }}><IndicatorWeather title={'Indicator 2'} subtitle={'Unidad 2'} value={"3.12"} /></Grid>
-      <Grid size={{ xs: 12, lg: 3 }}><IndicatorWeather title={'Indicator 3'} subtitle={'Unidad 3'} value={"2.31"} /></Grid>
-      <Grid size={{ xs: 12, lg: 3 }}><IndicatorWeather title={'Indicator 4'} subtitle={'Unidad 4'} value={"3.21"} /></Grid>
-      */}
+    <Grid container spacing={2}>
+      <Grid size={{ xs: 12 }}>
+        <Box sx={{
+          display: 'flex',
+          gap: '12px',
+          margin: '0rem 0rem 1.6rem',
+        }}>
+          <CloudOutlined sx={{
+            fontSize: 40
+          }}/>
+          <Typography component={'h1'} variant='h4'>
+            Pronóstico del Clima en Guayaquil
+          </Typography>
+        </Box>
+
+      </Grid>
       {
         indicators
           .map(
-            (indicator, idx) => (
-              <Grid key={idx} size={{ xs: 12, lg: 3 }}>
+            (indicator, idx) => idx < 4 && (
+              <Grid spacing={1} key={idx} size={{ xs: 6, lg: 3 }}>
                 <IndicatorWeather
-                  title={indicator["title"]}
-                  subtitle={indicator["subtitle"]}
-                  value={indicator["value"]} />
+                  weatherInfo={indicator} />
               </Grid>
             )
           )
@@ -146,14 +139,14 @@ function App() {
       {/* Indicadores */}
 
       {/* Tabla */}
-      <Grid size={{ xs: 12, lg: 8 }}>
+      <Grid size={{ xs: 12, lg: 8 }} spacing={4}>
         {/* Grid Anidado */}
-        <Grid container spacing={2}>
+        <Grid container >
           <Grid size={{ xs: 12, lg: 3 }}>
             <ControlWeather />
           </Grid>
           <Grid size={{ xs: 12, lg: 9 }}>
-            <TableWeather itemsIn={items}/>
+            <TableWeather itemsIn={items} />
           </Grid>
         </Grid>
       </Grid>

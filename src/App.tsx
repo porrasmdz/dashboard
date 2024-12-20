@@ -11,13 +11,6 @@ import { groupIndicatorsDataByDay } from './utils/utils'
 import { Box, Typography } from '@mui/material'
 import { CloudOutlined } from '@mui/icons-material'
 
-
-interface Indicator {
-  title?: String;
-  subtitle?: String;
-  value?: String;
-}
-
 function App() {
 
 

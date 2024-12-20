@@ -3,16 +3,15 @@ import { LineChart } from '@mui/x-charts/LineChart';
 import { useState, useEffect } from 'react';
 import Item from '../interface/Item';
 import { MyProp } from '../interface/MyProp';
-import { LineSeriesType } from '@mui/x-charts';
 import { formatTime } from '../utils/utils';
 
 
 export default function LineChartWeather(props: MyProp) {
     const [rows, setRows] = useState<Item[]>([])
-    const metrics = ["all", "humid", "temp", "wind", "cloud"]
+    const metrics = ["all", "temp", "wind", "humid", "cloud"]
     const [dateRanges, setDateRanges] = useState<string[]>([])
     const [humidity, setHumidity] = useState<number[]>([])
-    const [precipitation, setPrecipitation] = useState<number[]>([])
+    // const [precipitation, setPrecipitation] = useState<number[]>([])
     const [temperature, setTemperature] = useState<number[]>([])
     const [wind, setWind] = useState<number[]>([])
     const [clouds, setClouds] = useState<number[]>([])
@@ -40,7 +39,6 @@ export default function LineChartWeather(props: MyProp) {
         })
 
         setHumidity(humidityArray)
-        setPrecipitation(precipitationArray)
         setClouds(cloudsArray)
         setDateRanges(dateRangesArray)
         setWind(windArray)

@@ -4,7 +4,6 @@ import { WeatherIndicator } from "../interface/WeatherIndicator";
 import { useEffect, useState } from "react";
 import { getDayOfWeek, kelvinToCelsiusString, pcntToString } from "../utils/utils";
 import { Box, SvgIcon, SvgIconProps } from "@mui/material";
-import DeviceThermostatIcon from '@mui/icons-material/DeviceThermostat';
 
 export default function IndicatorWeather({ weatherInfo }: { weatherInfo: WeatherIndicator[] }) {
     const [weekDay, setWeekDay] = useState<string>("unknown")

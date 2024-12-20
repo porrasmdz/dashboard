@@ -5,7 +5,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 
 export default function ControlWeather({updateMetric}: {updateMetric: (idx: number)=> void}) {
 
@@ -22,7 +22,7 @@ export default function ControlWeather({updateMetric}: {updateMetric: (idx: numb
     ]
 
     {/* Variable de estado y función de actualización */ }
-    let [selected, setSelected] = useState(-1)
+    
 
     {/* Constante de referencia a un elemento HTML */ }
     const descriptionRef = useRef<HTMLDivElement>(null);
@@ -34,7 +34,7 @@ export default function ControlWeather({updateMetric}: {updateMetric: (idx: numb
     const handleChange = (event: SelectChangeEvent) => {
 
         let idx = parseInt(event.target.value)
-        setSelected(idx);
+
         if(idx < 0) {
             updateMetric(0)
         }

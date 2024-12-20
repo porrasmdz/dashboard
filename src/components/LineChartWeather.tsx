@@ -6,48 +6,81 @@ import { MyProp } from '../interface/MyProp';
 import { LineSeriesType } from '@mui/x-charts';
 import { formatTime } from '../utils/utils';
 
-const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
-const pData = [2400, 1398, 9800, 3908, 4800, 3800, 4300];
-const xLabels = [
-    'Page A',
-    'Page B',
-    'Page C',
-    'Page D',
-    'Page E',
-    'Page F',
-    'Page G',
-];
 
 export default function LineChartWeather(props: MyProp) {
     const [rows, setRows] = useState<Item[]>([])
-
+    const metrics = ["all", "humid", "temp", "wind", "cloud"]
     const [dateRanges, setDateRanges] = useState<string[]>([])
     const [humidity, setHumidity] = useState<number[]>([])
     const [precipitation, setPrecipitation] = useState<number[]>([])
+    const [temperature, setTemperature] = useState<number[]>([])
+    const [wind, setWind] = useState<number[]>([])
     const [clouds, setClouds] = useState<number[]>([])
+    const [series, setSeries] = useState<any[]>([])
     useEffect(() => {
         setRows(props.itemsIn)
-        console.log(rows)
         const humidityArray: number[] = []
         const precipitationArray: number[] = []
         const cloudsArray: number[] = []
+        const temperatureArray: number[] = []
+        const windArray: number[] = []
         const dateRangesArray: string[] = []
         rows.forEach((row) => {
             humidityArray.push(parseFloat(row.humidity) ?? 0)
             precipitationArray.push(parseInt(row.precipitation) ?? 0)
             cloudsArray.push(parseInt(row.clouds) ?? 0)
+            temperatureArray.push((parseInt(row.temperature) ?? 0) - 273.15)
+            windArray.push(parseInt(row.wind) ?? 0)
             const startDate = new Date(row.dateStart)
             const endDate = new Date(row.dateEnd)
-            console.log(row)
             const startTime = formatTime(startDate);
             const endTime = formatTime(endDate);
             const timeRange = `${startTime}\n - \n ${endTime}`;
             dateRangesArray.push(timeRange);
         })
+
         setHumidity(humidityArray)
         setPrecipitation(precipitationArray)
         setClouds(cloudsArray)
         setDateRanges(dateRangesArray)
+        setWind(windArray)
+        setTemperature(temperatureArray)
+
+        if (props.selectedMetric === undefined ||
+            props.selectedMetric === null ||
+            metrics[props.selectedMetric] === 'all') {
+            setSeries([
+                { data: humidity, label: 'Humedad' },
+                { data: temperature, label: 'Temperatura' },
+                { data: wind, label: 'Viento' },
+                { data: clouds, label: 'Nubosidad' },
+            ])
+        }
+        else if (metrics[props.selectedMetric] === 'humid') {
+        
+            setSeries([
+                { data: humidity, label: 'Humedad' },
+                
+            ])
+        }
+        else if (metrics[props.selectedMetric] === 'temp') {
+            setSeries([
+                { data: temperature, label: 'Temperatura' },
+                
+            ])
+
+        }
+        else if (metrics[props.selectedMetric] === 'wind') {
+            setSeries([
+                { data: wind, label: 'Viento' },
+            ])
+
+        }
+        else if (metrics[props.selectedMetric] === 'cloud') {
+            setSeries([
+                { data: clouds, label: 'Nubosidad' },
+            ])
+        }
     }, [props])
     return (
         <Paper
@@ -60,12 +93,13 @@ export default function LineChartWeather(props: MyProp) {
 
             {/* Componente para un gráfico de líneas */}
             <LineChart
-                width={400}
-                height={250}
-                series={[
-                    { data: humidity, label: 'Humedad' },
-                    { data: clouds, label: 'Nubosidad' },
-                ]}
+                height={350}
+                sx={{
+                    width: '100%',
+                }}
+                series={
+                    series
+                }
                 xAxis={[{ scaleType: 'point', data: dateRanges }]}
             />
         </Paper>

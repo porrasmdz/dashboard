@@ -67,7 +67,7 @@ export default function IndicatorWeather({ weatherInfo }: { weatherInfo: Weather
 
             <ThermometerIcon
                 className="lucide lucide-thermometer"
-                fill="none" stroke={isToday ? 'white' : 'black'} stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                fill="none" stroke={isToday ? 'white' : 'black'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                 sx={{
                     
                     fontSize: 60,

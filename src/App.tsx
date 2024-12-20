@@ -26,6 +26,7 @@ function App() {
   let [owm, setOWM] = useState(localStorage.getItem("openWeatherMap"))
 
   const [items, setItems] = useState<Item[]>([])
+  const [selectedMetric, setSelectedMetric] = useState<number>(0);
 
   {/* Variable de estado y función de actualización */ }
   useEffect(() => {
@@ -70,7 +71,7 @@ function App() {
         {/* Extracción y almacenamiento del contenido del XML agrupada por 4 dias futuros*/ }
         const todayDate = new Date()
         let dataToIndicators: Array<WeatherIndicator[]> = groupIndicatorsDataByDay(savedTextXML, todayDate)
-        console.log(dataToIndicators)
+
         setIndicators(dataToIndicators)
 
         let timeList = xml.getElementsByTagName("time") || ""
@@ -88,12 +89,20 @@ function App() {
 
           let clouds = timeItem.getElementsByTagName("clouds")[0]
           const cloudsAll = clouds.getAttribute("all") || ""
+
+          let temperature = timeItem.getElementsByTagName("temperature")[0]
+          const tVal = temperature.getAttribute("value") || ""
+          let wind = timeItem.getElementsByTagName("windSpeed")[0]
+          const windVal = wind.getAttribute("mps") || ""
+
           const resultItem: Item = {
             dateStart: timeFrom,
             dateEnd: timeTo,
             precipitation: probability,
             humidity: humidityVal,
-            clouds: cloudsAll
+            clouds: cloudsAll,
+            wind: windVal,
+            temperature: tVal
           }
           dataToItems.push(resultItem)
         });
@@ -117,7 +126,7 @@ function App() {
         }}>
           <CloudOutlined sx={{
             fontSize: 40
-          }}/>
+          }} />
           <Typography component={'h1'} variant='h4'>
             Pronóstico del Clima en Guayaquil
           </Typography>
@@ -128,7 +137,7 @@ function App() {
         indicators
           .map(
             (indicator, idx) => idx < 4 && (
-              <Grid spacing={1} key={idx} size={{ xs: 6, lg: 3 }}>
+              <Grid key={idx} size={{ xs: 6, lg: 3 }}>
                 <IndicatorWeather
                   weatherInfo={indicator} />
               </Grid>
@@ -139,21 +148,24 @@ function App() {
       {/* Indicadores */}
 
       {/* Tabla */}
-      <Grid size={{ xs: 12, lg: 8 }} spacing={4}>
+      <Grid size={{ xs: 12 }} >
         {/* Grid Anidado */}
-        <Grid container >
-          <Grid size={{ xs: 12, lg: 3 }}>
-            <ControlWeather />
+        <Grid container spacing={2}>
+
+          <Grid size={{ xs: 12, lg: 8 }}>
+
+            <LineChartWeather itemsIn={items} selectedMetric={selectedMetric}/>
           </Grid>
-          <Grid size={{ xs: 12, lg: 9 }}>
-            <TableWeather itemsIn={items} />
+          <Grid size={{ xs: 12, lg: 4 }}>
+            <ControlWeather updateMetric={setSelectedMetric}/>
           </Grid>
         </Grid>
       </Grid>
 
-      {/* Gráfico */}
-      <Grid size={{ xs: 12, lg: 4 }}>
-        <LineChartWeather itemsIn={items} />
+      {/* Tabla */}
+      <Grid size={{ xs: 12 }}>
+
+        <TableWeather itemsIn={items} />
       </Grid>
 
     </Grid>

@@ -7,11 +7,16 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { useState, useRef } from 'react';
 
-export default function ControlWeather() {
+export default function ControlWeather({updateMetric}: {updateMetric: (idx: number)=> void}) {
 
     {/* Arreglo de objetos */ }
     let items = [
-        { "name": "Precipitación", "description": "Cantidad de agua que cae sobre una superficie en un período específico." },
+        // { "name": "Precipitación", "description": "Cantidad de agua que cae sobre una superficie en un período específico." },
+        //{ "name": "Precipitación", "description": "Cantidad de agua que cae sobre una superficie en un período específico." },
+        { "name": "Todos", "description": "Vista General." },
+        
+        { "name": "Temperatura", "description": "Medida de calor o frío expresada en grados Celsius (°C), indicando la energía térmica del ambiente." },
+        { "name": "Viento", "description": "Velocidad del aire en movimiento, medida en metros por segundo (m/s), indicando la intensidad del flujo de aire." },
         { "name": "Humedad", "description": "Cantidad de vapor de agua presente en el aire, generalmente expresada como un porcentaje." },
         { "name": "Nubosidad", "description": "Grado de cobertura del cielo por nubes, afectando la visibilidad y la cantidad de luz solar recibida." }
     ]
@@ -30,6 +35,12 @@ export default function ControlWeather() {
 
         let idx = parseInt(event.target.value)
         setSelected(idx);
+        if(idx < 0) {
+            updateMetric(0)
+        }
+        else {
+            updateMetric(idx)
+        }
         {/* Modificación de la referencia descriptionRef */ }
         if (descriptionRef.current !== null) {
             descriptionRef.current.innerHTML = (idx >= 0) ? items[idx]["description"] : ""
@@ -42,6 +53,7 @@ export default function ControlWeather() {
             sx={{
                 p: 2,
                 display: 'flex',
+                height: '350px',
                 flexDirection: 'column'
             }}
         >
